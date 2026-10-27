@@ -1,0 +1,80 @@
+classDiagram
+    direction TB
+
+    %% Controller / Beans
+    class GhostNetController {
+        <<Named, SessionScoped>>
+        -GhostNet currentNet
+        -List~GhostNet~ allNets
+        -String neuMelderName
+        -String neuMelderTel
+        -String bergenderName
+        -String bergenderTel
+        -String melderName
+        -String melderTel
+        -GhostNetDAO dao
+        +init() void
+        +loadNets() void
+        +reportNet() void
+        +bergungEintragen(GhostNet net) void
+        +alsGeborgenMarkieren(GhostNet net) void
+        +alsVerschollenMelden(GhostNet net) void
+        +isRecoverable(GhostNet net) boolean
+        +isVerschollenMeldenMoeglich(GhostNet net) boolean
+    }
+
+    class GhostNetDAO {
+        <<Data Access Object>>
+        +saveGhostNet(GhostNet net) void
+        +updateGhostNet(GhostNet net) void
+        +getAllNets() List~GhostNet~
+        +findOrCreatePerson(String name, String tel) Person
+    }
+    
+    class JPAUtil {
+        <<Utility>>
+        -EntityManagerFactory factory
+        +getEntityManagerFactory() EntityManagerFactory
+        +shutdown() void
+    }
+
+    %% Entities
+    class GhostNet {
+        <<Entity>>
+        -Long id
+        -double latitude
+        -double longitude
+        -double estimatedSize
+        -NetStatus status
+        -Person bergendePerson
+        -Person meldendePerson
+        -Person verschollenMelder
+    }
+
+    class Person {
+        <<Entity>>
+        -Long id
+        -String name
+        -String telefonnummer
+        -List~GhostNet~ zuBergendeNetze
+        -List~GhostNet~ gemeldeteNetze
+        -List~GhostNet~ alsVerschollenGemeldeteNetze
+    }
+
+    class NetStatus {
+        <<Enumeration>>
+        GEMELDET
+        BERGUNG_BEVORSTEHEND
+        GEBORGEN
+        VERSCHOLLEN
+    }
+
+    %% Beziehungen
+    GhostNetController --> GhostNetDAO : nutzt
+    GhostNetController --> GhostNet : verwaltet (currentNet)
+    GhostNetDAO --> JPAUtil : holt EntityManager
+    GhostNetDAO --> GhostNet : speichert/lädt
+    GhostNetDAO --> Person : speichert/lädt
+    GhostNet "*" <--> "0..1" Person : bergendePerson / zuBergendeNetze
+    GhostNet "*" <--> "0..1" Person : meldendePerson / gemeldeteNetze
+    GhostNet "*" <--> "0..1" Person : verschollenMelder / alsVerschollenGemeldeteNetze

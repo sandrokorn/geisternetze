@@ -1,0 +1,14 @@
+stateDiagram-v2
+    direction TB
+    [*] --> Dashboard_Index_xhtml
+    
+    state Dashboard_Index_xhtml {
+        direction LR
+        Meldebereich --> Verwaltungsbereich : Scroll / Ansicht
+    }
+    
+    Verwaltungsbereich --> Bergung_Dialog : Klick auf "Bergen"
+    Verwaltungsbereich --> Verschollen_Dialog : Klick auf "Verschollen"
+    
+    Bergung_Dialog --> Verwaltungsbereich : Eintragen / Abbrechen
+    Verschollen_Dialog --> Verwaltungsbereich : Melden / Abbrechen
